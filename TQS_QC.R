@@ -1,4 +1,5 @@
 # Quality control for Skyline + TQS CoAs run
+# Starting to edit on 1/15/2020
 source("Functions.R")
 
 # User parameters  ----------------------------------------------------
