@@ -1,7 +1,7 @@
 # Quality control for Skyline + TQS CoAs run
 # Starting to edit on 1/15/2020
 
-# Lindsay made this edit on friday afternoon
+# Regina made this edit on Friday afternoon.
 source("Functions.R")
 
 # User parameters  ----------------------------------------------------
