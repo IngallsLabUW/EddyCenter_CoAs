@@ -203,6 +203,7 @@ all.samples.IR <- all.samples %>%
   group_by(Precursor.Ion.Name) %>%
   mutate(IR.Ratio = ifelse(TRUE %in% Significant.Size, (Area[Quan.Trace == TRUE] / Area[Second.Trace == TRUE]), NA))
 
+
 IR.flags.added <- all.samples.IR %>%
   left_join(IR.Table, by = "Precursor.Ion.Name") %>%
   mutate(IR.Flag = ifelse((IR.Ratio < (IR.min - IR.flex) & IR.Ratio > (IR.max + IR.flex)), "IR.Flag", NA)) %>%
@@ -212,11 +213,13 @@ IR.flags.added <- all.samples.IR %>%
 # If the Retention Time is "RT.flex" further away from the RT.Reference 
 # Range from the RT.Range Table, add a flag. 
 RT.flags.added <- IR.flags.added %>%
-  merge(y = all.samples, all.x = TRUE) %>%
-  left_join(RT.Range.Table, by = "Precursor.Ion.Name") %>%
+  merge(y = all.samples) %>%
+  left_join(RT.Range.Table) %>%
   mutate(RT.Flag = ifelse((Retention.Time >= (RT.max + RT.flex) | Retention.Time <= (RT.min - RT.flex)), "RT.Flag", NA)) 
   #select(Replicate.Name:Area, Quan.Trace:Second.Trace, IR.Flag, RT.Flag) %>%
   #arrange(Precursor.Ion.Name, Product.Mz)
+
+
 
 # Blank Flags  ---------------------------------------
 # If the Area divided by the Blank.Reference value is
