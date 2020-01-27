@@ -224,15 +224,20 @@ RT.flags.added <- IR.flags.added %>%
 # Blank Flags  ---------------------------------------
 # If the Area divided by the Blank.Reference value is
 # greater than the set blk.thresh value, add a flag.
+# If the name includes "13C", add an IS flag. 
 Blank.flags.added <- RT.flags.added %>%
   left_join(select(Blank.Table, Blank.max, Precursor.Ion.Name), by = "Precursor.Ion.Name") %>%
   group_by(Precursor.Ion.Name) %>%
   mutate(Blank.Reference = Area * blk.thresh) %>%
   #mutate(blank.Flag = ifelse(((Protein.Name != "Internal Std") & (Area * blk.thresh) < Blank.max), "blank.Flag", NA)) %>%
-  mutate(blank.Flag = ifelse(((Protein.Name != "Internal Std") & (Area * blk.thresh) < Blank.max), 
-                             "blank.Flag", 
-                             ifelse(((Protein.Name == "Internal Std") & (Area * blk.thresh < Blank.max)), "IS.blank.Flag", NA))) %>%
-  select(Replicate.Name:RT.Flag, blank.Flag)
+  #mutate(blank.Flag = ifelse(((Protein.Name != "Internal Std") & (Area * blk.thresh) < Blank.max), 
+  #                          "blank.Flag", 
+  #                         ifelse(((Protein.Name == "Internal Std") & (Area * blk.thresh < Blank.max)), "IS.blank.Flag", NA))) %>%
+  mutate(blank.Flag = ifelse(((!str_detect(Precursor.Ion.Name, "13C")) & (Area * blk.thresh) < Blank.max), 
+                            "blank.Flag", 
+                           ifelse(((str_detect(Precursor.Ion.Name, "13C")) & (Area * blk.thresh < Blank.max)), "IS.blank.Flag", NA))) %>%
+  
+  select(Replicate.Name:RT.Flag, blank.Flag) 
 
 
 # Height Flags  ---------------------------------------
