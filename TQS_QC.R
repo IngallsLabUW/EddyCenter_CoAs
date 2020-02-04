@@ -245,7 +245,7 @@ Blank.flags.added <- RT.flags.added %>%
 # value. Add an overloaded flag if the Height falls above the
 # max.height value.
 Height.flags.added <- Blank.flags.added %>%
-  left_join(Height.Table, by = c("Replicate.Name", "Precursor.Ion.Name", "Precursor.Mz", "Product.Mz")) %>%
+  left_join(Height.Table, by = c("Replicate.Name", "Precursor.Ion.Name", "Precursor.Mz", "Product.Mz", "Height")) %>%
   mutate(height.min.Flag = ifelse((Height < min.height), "height.min.Flag", NA)) %>%
   mutate(overloaded.Flag = ifelse((Height > max.height), "overloaded.Flag", NA)) %>%
   select(-Height)
