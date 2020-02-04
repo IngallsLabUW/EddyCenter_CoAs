@@ -252,16 +252,18 @@ Height.flags.added <- Blank.flags.added %>%
 
 # Area Flags  ---------------------------------------
 # If the Area is less than the area.min value, add a flag.
+# Edit: Removed select(-Sample.Type), not found in flag table
 Area.flags.added <- Height.flags.added %>%
-  mutate(area.min.Flag = ifelse((Area < area.min), "area.min.Flag", NA)) %>%
-  select(-Sample.Type)
+  mutate(area.min.Flag = ifelse((Area < area.min), "area.min.Flag", NA))
 
 # Signal to Noise Flags  ---------------------------------------
 # If the Signal to Noise ratio is less than the SN.min, add a flag.
+# Edit: Added background to left_join function
+# changed select(-c(Sample.Type:Signal.to.Noise)) -> select(-Signal.to.Noise))
 SN.flags.added <- Area.flags.added %>%
-  left_join(SN.Table, by = c("Replicate.Name", "Precursor.Ion.Name", "Area")) %>%
+  left_join(SN.Table, by = c("Replicate.Name", "Precursor.Ion.Name", "Area", "Background")) %>%
   mutate(SN.Flag = ifelse((Signal.to.Noise < SN.min), "SN.Flag", NA)) %>%
-  select(-c(Sample.Type:Signal.to.Noise))
+  select(-Signal.to.Noise)
 
 # All Flags  ---------------------------------------
 # Add a column with all flags from the previous steps. 
@@ -288,7 +290,8 @@ if (any(Stds.test == TRUE)) {
   print("There are standards in this run. Joining to the bottom of the dataset!", quote = FALSE)
   ##
   standards <- CoAs %>%
-    filter(Sample.Type == "std") %>%
+    #filter(Sample.Type == "std") %>%
+    filter(str_detect(Replicate.Name, "Std")) %>%
     merge(y = masterfile,
           by.x = c("Precursor.Ion.Name", "Product.Mz"),
           by.y = c("Compound.Name", "Daughter"),
@@ -296,7 +299,8 @@ if (any(Stds.test == TRUE)) {
     mutate(Second.Trace = ifelse(Second.Trace == "", FALSE, TRUE)) %>%
     mutate(Quan.Trace = ifelse(Quan.Trace == "no", FALSE, TRUE)) %>%
     filter(Quan.Trace == TRUE) %>%
-    select(Replicate.Name:Sample.Type)
+    #select(Replicate.Name:Sample.Type)
+    select(c(Replicate.Name, Precursor.Ion.Name, Precursor.Mz, Product.Mz))
   final.table <- rbind.fill(final.table, standards)
 } else {
   print("No standards exist in this set.")
@@ -306,7 +310,8 @@ if (any(Blks.test == TRUE)) {
   print("There are blanks in this run. Joining to the bottom of the dataset!", quote = FALSE)
   ##
   blanks <- CoAs %>%
-    filter(Sample.Type == "blk") %>%
+    #filter(Sample.Type == "blk") %>%
+    filter(str_detect(Replicate.Name, "Blk")) %>%
     merge(y = masterfile,
           by.x = c("Precursor.Ion.Name", "Product.Mz"),
           by.y = c("Compound.Name", "Daughter"),
@@ -314,7 +319,8 @@ if (any(Blks.test == TRUE)) {
     mutate(Second.Trace = ifelse(Second.Trace == "", FALSE, TRUE)) %>%
     mutate(Quan.Trace = ifelse(Quan.Trace == "no", FALSE, TRUE)) %>%
     filter(Quan.Trace == TRUE) %>%
-    select(Replicate.Name:Sample.Type)
+    #select(Replicate.Name:Sample.Type)
+    select(c(Replicate.Name, Precursor.Ion.Name, Precursor.Mz, Product.Mz))
   final.table <- rbind.fill(final.table, blanks)
 } else {
   print("No blanks exist in this set.")
