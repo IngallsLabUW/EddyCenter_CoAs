@@ -330,6 +330,7 @@ if (any(Blks.test == TRUE)) {
 # Add comments restating the given QC parameters. Save to 
 # current working directory with a new name, 
 # "TQSQC_<original file name>.csv
+input.file <- "./data_raw/181113_CoAs_MESO-SCOPE_HRM.csv"
 con <- file(paste("TQSQC_", basename(input.file), sep = ""), open = "wt")
 writeLines(paste("Hello! Welcome to the world of TQS Quality Control! ",
                  "Minimum height for a real peak: ", min.height, ". ",
